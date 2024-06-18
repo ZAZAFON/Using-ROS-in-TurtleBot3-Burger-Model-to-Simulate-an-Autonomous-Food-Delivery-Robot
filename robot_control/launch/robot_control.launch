@@ -1,0 +1,33 @@
+<launch>
+  <!-- Set the TurtleBot3 model -->
+  <arg name="model" default="burger"/>
+  <arg name="map_file" default="$(find robot_control)/maps/tunnel.yaml"/>
+  <arg name="open_rviz" default="true"/>
+
+  <!-- Launch TurtleBot3 bringup -->
+  <include file="$(find turtlebot3_bringup)/launch/turtlebot3_remote.launch">
+    <arg name="model" value="$(arg model)"/>
+  </include>
+
+  <!-- Start the map server -->
+  <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+
+  <!-- Start AMCL -->
+  <include file="$(find turtlebot3_navigation)/launch/amcl.launch">
+    <arg name="initial_pose_x" default="-1.71"/>
+    <arg name="initial_pose_y" default="-0.241"/>
+    <arg name="initial_pose_a" default="80"/>
+  </include>
+
+  <!-- Start move_base -->
+  <include file="$(find turtlebot3_navigation)/launch/move_base.launch">
+    <arg name="model" value="$(arg model)"/>
+  </include>
+
+  <!-- Start RViz -->
+  <group if="$(arg open_rviz)">
+    <node pkg="rviz" type="rviz" name="rviz" required="true"
+          args="-d $(find turtlebot3_navigation)/rviz/turtlebot3_navigation.rviz"/>
+  </group>
+</launch>
+
